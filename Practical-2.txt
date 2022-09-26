@@ -1,0 +1,260 @@
+import java.util.Scanner;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+
+
+/**
+ * Write a description of class Marks here.
+ *
+ * @author (Ashu Kaushik)
+ * @version (14/09/2022)
+ */
+public class StudentMarks
+{
+    private ArrayList<StudentMarks> list;
+    private String fullName;
+    private int id;
+    private double a1,a2,a3;
+    int count = 1;
+    double[] total= new double[count];
+    int i=0;
+    
+    public StudentMarks()
+    {
+        
+    }
+     
+    public StudentMarks(String firstName, String lastName, int id, double a1,double a2,double a3)
+    {
+        this.fullName = firstName+" "+lastName;
+        this.id = id;
+        this.a1 = a1;
+        this.a2 = a2;
+        this.a3 = a3;
+    }
+    
+    public static void main(String[] args) throws Exception {
+        StudentMarks st = new StudentMarks();
+        st.mainMenu();
+    }
+    
+    public void mainMenu() throws Exception{
+    
+        
+        list = fileRead();
+        Scanner option = new Scanner(System.in);
+        System.out.println("\nSelect the menu"+
+            "\n 1. Enter1 to display student information and assignment marks"+
+             "\n 2. Enter2 to display total marks of all student assignment"+
+              "\n 3. Enter3 to display the list of students with the total marks less than the threshold marks"+
+               "\n 4. Enter4 to display the 10 highest and the lowest student marks"+
+                "\n 5. Enter5 to exit from the menu\n");
+                
+                
+                
+        int optionId;
+        optionId = option.nextInt();
+          switch (optionId) 
+          {
+              case 1:
+                  System.out.println("Student details and Marks");
+                    for(StudentMarks l:list){
+                      System.out.println(l.toString());
+                      
+                    }
+                    mainMenu();
+                  break;
+              case 2:
+                  System.out.println("Student details, Marks and Total Marks");
+                  for(StudentMarks l:list)
+                  {
+                      System.out.println(l.toString2());
+                  }
+                  mainMenu();
+                  break;
+              case 3:
+                  System.out.println("Student details, Marks and Total Marks for who less than threshold marks");
+                  float th;
+                  th = option.nextInt();
+                  
+                  for(StudentMarks l:list)
+                  {
+                      String s = l.toString3(th);
+                      if(s !=null)
+                      System.out.println(s);
+                      
+                  }
+                  mainMenu();
+                  break;
+              case 4:
+            
+                  System.out.println(" \nThe highest marks of the student: Highest Marks");
+                  float lenght= 58;
+                  
+                  for(StudentMarks l:list)
+                  {
+                      System.out.println(l.toString4());
+                      for(int i=0;i<total.length;i++)
+                      {
+                       System.out.println(total[i]+",");   
+                      }
+                      
+                    }
+                  System.out.println(" \n\nThe lowest marks of the student: Lowest Marks\n");
+                  for(StudentMarks l:list)
+                  {
+                      System.out.println(l.toString4());
+                      for(int i=0;i<total.length;i++)
+                      {
+                       System.out.println(total[i]+",");   
+                      }
+                    
+                  }
+
+                  mainMenu();
+                  break;
+            
+             case 0:
+                  break;
+          }
+          
+                
+  }
+  
+    // Read Existing File.
+    
+  public static ArrayList<StudentMarks> fileRead() throws Exception{
+      
+      
+      ArrayList<StudentMarks> list = new ArrayList<StudentMarks>();
+      Scanner file = new Scanner(new File("prog5001_students_grade_2022.csv"));
+      file.useDelimiter(",");
+      String uniName;
+      
+      while (file.hasNextLine()){
+          
+          String line = file.nextLine();
+          String[] data;
+          String initialLine;
+          
+          if (line.contains("Unit"))
+          {
+              initialLine = line;
+          }
+          else if(!line.contains("First Name")){
+              data = line.split(",");
+              
+              
+              if (data.length== 4){
+                     list.add(new StudentMarks(data[0],data[1],Integer.parseInt(data[2]),Double.parseDouble(data[3]),0.0,0.0));
+                  
+                }
+                else if (data.length== 5){
+                list.add(new StudentMarks(data[0],data[1],Integer.parseInt(data[2]),Double.parseDouble(data[3]),Double.parseDouble(data[4]),0.0));
+
+                } 
+                else if (data.length== 3){
+                  list.add(new StudentMarks(data[0],data[1],Integer.parseInt(data[2]),0.0,0.0,0.0));
+                
+              } 
+              else{
+                  String a1 = data[3];
+                  String a2 = data[4];
+                  String a3 = data[4];
+                  if (data[3].isEmpty())
+                  {
+                      a1 = "0.0";  
+                  }
+                   if (data[4].isEmpty())
+                  {
+                      a2 = "0.0";  
+                  }
+                  if (data[5].isEmpty())
+                  {
+                      a3 = "0.0";  
+                  }
+                  list.add(new StudentMarks(data[0],data[1],Integer.parseInt(data[2]),Double.parseDouble(a1),Double.parseDouble(a2),Double.parseDouble(a3)));                  
+              }
+          }
+            
+          }
+          
+      
+     file.close(); 
+    return list;
+  }
+  
+  // Read the FullName and Id of the students from file.
+  
+  public String toString()
+  {
+      return String.format("id:%d, FullName: %s A1:%.2f,A2:%.2f,A3:%.2f",
+      id,fullName,a1,a2,a3);
+      
+  }
+  
+  // To find the total marks of the student.
+  
+  
+  public String toString2()
+  {
+      double totalMarks =getTotalMarks();
+      return String.format("id:%d, FullName: %s A1:%.2f,A2:%.2f,A3:%.2f,Total:%.2f",
+      id,fullName,a1,a2,a3,totalMarks);
+      
+  }
+  
+  // To find the students who marks less than threshold marks.
+  
+  
+  public String toString3(float th)
+  {
+      double totalMarks =getTotalMarks();
+      if (totalMarks<th){
+          return String.format("id:%d, FullName: %s A1:%.2f,A2:%.2f,A3:%.2f,Total:%.2f",
+          id,fullName,a1,a2,a3,totalMarks);
+      }
+      else
+      return null;
+  }
+  
+  // To find the highest and lowest total marks of the student.
+  
+  
+  public String toString4()
+  {
+      double totalMarks =getTotalMarks();
+      double highestMarks = total[0];
+      double lowestMarks = total[0];
+      for(int i=0;i<total.length;i++)
+      {if(total[i] > totalMarks)
+          {
+              highestMarks = total[i];
+          }
+        }
+      
+ 
+         
+        for(int i=0;i<total.length;i++)
+      {if(total[i] < totalMarks)
+          {
+              lowestMarks = total[i];
+          }
+        }
+       
+        
+      return String.format("id:%d, FullName: %s A1:%.2f,A2:%.2f,A3:%.2f,Total:%.2f,",
+          id,fullName,a1,a2,a3,totalMarks);
+      
+        }
+    
+  public double getTotalMarks()
+  
+  {
+      double total = a1+a2+a2;
+      return total;
+      
+  }
+  }
